@@ -1,8 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+GoogleSignIn _googleSignIn = GoogleSignIn(
+  scopes: [
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ],
+);
+
+
+
 
 Future<Post> fetchPost() async {
   final response =
@@ -296,6 +306,15 @@ Future<Post> post;
     post = fetchPost();
   }
 
+  Future<void> _incrementCounter() async {
+    try {
+      await _googleSignIn.signIn();
+    } catch (error) {
+      print(error);
+    }
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -308,7 +327,10 @@ Future<Post> post;
           title: Text('Fetch Data Example'),
         ),
         body: Center(
-          child: FutureBuilder<Post>(
+          child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FutureBuilder<Post>(
             future: post,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -321,7 +343,24 @@ Future<Post> post;
               return CircularProgressIndicator();
             },
           ),
-        ),
+           FlatButton(
+              color: Colors.blue,
+              textColor: Colors.white,
+              disabledColor: Colors.grey,
+              disabledTextColor: Colors.black,
+              padding: EdgeInsets.all(8.0),
+              splashColor: Colors.blueAccent,
+              onPressed: () {
+                _incrementCounter();
+              },
+              child: Text(
+                "Log in",
+              ),
+            )
+          ] 
+          
+          
+        )),
       ),
     );
   }
